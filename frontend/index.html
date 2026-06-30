@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BazaarPK — بازار پی کے</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --surface-0:#f0f0ee;--surface-1:#f7f7f5;--surface-2:#ffffff;
+    --text-primary:#1a1a18;--text-secondary:#4a4a47;--text-muted:#888780;
+    --border:rgba(0,0,0,0.1);--border-strong:rgba(0,0,0,0.18);--border-accent:rgba(22,163,74,0.4);
+    --fill-accent:#16a34a;--bg-accent:#dcfce7;--text-accent:#15803d;
+    --fill-success:#16a34a;--bg-success:#dcfce7;--text-success:#15803d;
+    --fill-danger:#dc2626;--bg-danger:#fee2e2;--text-danger:#dc2626;
+    --bg-warning:#fef9c3;--text-warning:#a16207;
+    --radius:8px;--font-sans:system-ui,-apple-system,sans-serif;
+  }
+  body{font-family:var(--font-sans);background:var(--surface-0);color:var(--text-primary);min-height:100vh}
+
+  /* NAV */
+  .nav{background:var(--surface-2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1rem;gap:12px;position:sticky;top:0;z-index:100;height:56px}
+  .nav-brand{font-size:20px;font-weight:600;color:var(--fill-accent);cursor:pointer;display:flex;align-items:center;gap:6px;text-decoration:none}
+  .nav-brand-sub{font-size:11px;color:var(--text-muted);font-weight:400}
+  .nav-search{flex:1;max-width:400px;margin:0 auto;position:relative}
+  .nav-search input{width:100%;padding:8px 12px 8px 36px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface-1);font-size:13px;color:var(--text-primary);outline:none}
+  .nav-search input:focus{border-color:var(--border-accent)}
+  .nav-search i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:15px}
+  .nav-actions{display:flex;align-items:center;gap:6px;margin-left:auto}
+  .nav-btn{background:none;border:1px solid var(--border-strong);border-radius:var(--radius);padding:7px 12px;cursor:pointer;font-size:13px;color:var(--text-primary);display:flex;align-items:center;gap:5px;position:relative;font-family:inherit}
+  .nav-btn:hover{background:var(--surface-1)}
+  .badge{background:var(--fill-accent);color:white;border-radius:50%;width:18px;height:18px;font-size:10px;display:flex;align-items:center;justify-content:center;position:absolute;top:-7px;right:-7px;font-weight:600}
+
+  /* LAYOUT */
+  .main{display:grid;grid-template-columns:200px 1fr;min-height:calc(100vh - 56px)}
+  .sidebar{background:var(--surface-1);border-right:1px solid var(--border);padding:1rem 0;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto}
+  .sidebar h3{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;padding:0 1rem .5rem}
+  .cat-item{display:flex;align-items:center;gap:8px;padding:9px 1rem;cursor:pointer;font-size:13px;color:var(--text-secondary);transition:.15s}
+  .cat-item:hover,.cat-item.active{background:var(--bg-accent);color:var(--text-accent)}
+  .cat-item i{font-size:16px;width:18px;flex-shrink:0}
+  .sidebar-section{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)}
+  .price-range{padding:0 1rem}
+  .price-range label{font-size:12px;color:var(--text-muted);margin-bottom:6px;display:block}
+  .price-range input[type=range]{width:100%;accent-color:var(--fill-accent)}
+  .price-vals{display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-top:2px}
+
+  /* CONTENT */
+  .content{overflow-y:auto;padding:1rem}
+  .toolbar{display:flex;align-items:center;gap:8px;margin-bottom:1rem}
+  .toolbar select{padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface-2);font-size:12px;color:var(--text-primary);font-family:inherit;outline:none}
+  .count{font-size:12px;color:var(--text-muted);margin-left:auto}
+
+  /* PRODUCT GRID */
+  .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+  .product-card{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:.15s}
+  .product-card:hover{border-color:var(--border-accent);box-shadow:0 2px 8px rgba(22,163,74,.1)}
+  .product-img{width:100%;aspect-ratio:1;background:linear-gradient(135deg,#dcfce7,#d1fae5);display:flex;align-items:center;justify-content:center;font-size:48px;position:relative}
+  .product-badge{position:absolute;top:8px;left:8px;background:#dc2626;color:white;font-size:10px;padding:2px 7px;border-radius:4px;font-weight:600}
+  .product-body{padding:10px}
+  .product-name{font-size:13px;font-weight:500;margin-bottom:2px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .product-ur{font-size:11px;color:var(--text-muted);margin-bottom:6px}
+  .product-price{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+  .price-main{font-size:15px;font-weight:600;color:var(--text-accent)}
+  .price-old{font-size:11px;color:var(--text-muted);text-decoration:line-through}
+  .stars{display:flex;gap:1px;font-size:11px;color:#f59e0b;align-items:center}
+  .add-btn{width:100%;padding:7px;background:var(--bg-accent);border:1px solid var(--border-accent);border-radius:var(--radius);cursor:pointer;font-size:12px;color:var(--text-accent);margin-top:7px;font-weight:500;font-family:inherit;transition:.15s}
+  .add-btn:hover{background:var(--fill-accent);color:white;border-color:var(--fill-accent)}
+
+  /* VIEWS */
+  .view{display:none}
+  .view.active{display:block}
+
+  /* PRODUCT DETAIL */
+  .product-detail{max-width:820px}
+  .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem}
+  .detail-img-box{aspect-ratio:1;background:linear-gradient(135deg,#dcfce7,#bbf7d0);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:110px}
+  .detail-info h1{font-size:22px;font-weight:600;margin-bottom:.4rem;line-height:1.3}
+  .detail-ur{color:var(--text-muted);font-size:14px;margin-bottom:.75rem}
+  .detail-price{font-size:30px;font-weight:700;color:var(--text-accent)}
+  .detail-oldprice{font-size:14px;color:var(--text-muted);text-decoration:line-through;margin-bottom:.5rem}
+  .detail-desc{font-size:14px;color:var(--text-secondary);line-height:1.7;margin-bottom:1rem;border-top:1px solid var(--border);padding-top:1rem}
+  .qty-row{display:flex;align-items:center;gap:10px;margin-bottom:1rem}
+  .qty-btn{width:34px;height:34px;border:1px solid var(--border-strong);border-radius:var(--radius);cursor:pointer;background:var(--surface-1);font-size:18px;display:flex;align-items:center;justify-content:center;color:var(--text-primary);font-family:inherit}
+  .qty-btn:hover{background:var(--surface-0)}
+  .qty-num{font-size:17px;font-weight:600;min-width:28px;text-align:center}
+  .add-to-cart-btn{padding:11px 28px;background:var(--fill-accent);color:white;border:none;border-radius:var(--radius);cursor:pointer;font-size:14px;font-weight:600;font-family:inherit;transition:.15s}
+  .add-to-cart-btn:hover{background:#15803d}
+  .detail-meta{display:flex;gap:16px;margin-bottom:1rem;flex-wrap:wrap}
+  .detail-meta-item{font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:4px}
+
+  /* CART */
+  .cart-view{max-width:660px}
+  .cart-item{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--border)}
+  .cart-item-img{width:56px;height:56px;border-radius:10px;background:var(--bg-accent);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+  .cart-item-info{flex:1}
+  .cart-item-name{font-size:14px;font-weight:500;margin-bottom:2px}
+  .cart-item-price{font-size:12px;color:var(--text-muted)}
+  .cart-item-actions{display:flex;align-items:center;gap:8px}
+  .cart-summary{background:var(--surface-1);border-radius:12px;padding:1rem 1.25rem;margin-top:1rem;border:1px solid var(--border)}
+  .summary-row{display:flex;justify-content:space-between;font-size:14px;padding:5px 0;color:var(--text-secondary)}
+  .summary-row.total{font-weight:700;font-size:16px;border-top:1px solid var(--border);padding-top:10px;margin-top:6px;color:var(--text-primary)}
+  .promo-row{display:flex;gap:8px;margin:10px 0}
+  .promo-row input{flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;background:var(--surface-2);color:var(--text-primary);font-family:inherit;outline:none}
+  .promo-row input:focus{border-color:var(--border-accent)}
+  .promo-msg{font-size:12px;color:var(--text-success);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+  .promo-err{font-size:12px;color:var(--text-danger);min-height:16px}
+  .checkout-btn{width:100%;padding:13px;background:var(--fill-accent);color:white;border:none;border-radius:var(--radius);cursor:pointer;font-size:15px;font-weight:600;margin-top:.75rem;font-family:inherit;transition:.15s}
+  .checkout-btn:hover{background:#15803d}
+
+  /* CHECKOUT */
+  .checkout-view{max-width:620px}
+  .form-section{background:var(--surface-2);border-radius:12px;padding:1.25rem;margin-bottom:1rem;border:1px solid var(--border)}
+  .form-section h3{font-size:15px;font-weight:600;margin-bottom:.85rem;display:flex;align-items:center;gap:7px}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .form-field{display:flex;flex-direction:column;gap:4px}
+  .form-field label{font-size:12px;color:var(--text-muted);font-weight:500}
+  .form-field input,.form-field select,.form-field textarea{padding:9px 11px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;background:var(--surface-1);color:var(--text-primary);font-family:inherit;outline:none;transition:.15s}
+  .form-field input:focus,.form-field select:focus{border-color:var(--border-accent)}
+  .form-field.full{grid-column:1/-1}
+  .pay-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .pay-option{border:1px solid var(--border);border-radius:10px;padding:11px;cursor:pointer;display:flex;align-items:center;gap:9px;font-size:13px;transition:.15s}
+  .pay-option:hover{border-color:var(--border-accent)}
+  .pay-option.selected{border-color:var(--fill-accent);background:var(--bg-accent)}
+  .pay-icon{font-size:22px;flex-shrink:0}
+  .pay-label{font-weight:500;font-size:13px}
+  .pay-note{font-size:11px;color:var(--text-muted)}
+  .place-btn{width:100%;padding:13px;background:var(--fill-accent);color:white;border:none;border-radius:var(--radius);cursor:pointer;font-size:15px;font-weight:600;margin-top:.75rem;font-family:inherit;transition:.15s}
+  .place-btn:hover{background:#15803d}
+
+  /* CONFIRMATION */
+  .confirm-view{max-width:520px;text-align:center;padding:2rem 1rem}
+  .confirm-icon{font-size:72px;margin-bottom:1rem;display:block}
+  .confirm-view h2{font-size:24px;font-weight:700;margin-bottom:.5rem}
+  .confirm-view p{color:var(--text-secondary);margin-bottom:.5rem;font-size:15px}
+  .order-num{background:var(--bg-accent);color:var(--text-accent);padding:10px 20px;border-radius:var(--radius);font-weight:700;font-size:15px;display:inline-block;margin:1rem 0;border:1px solid var(--border-accent);letter-spacing:.5px}
+  .track-steps{display:flex;justify-content:center;gap:0;margin:1.5rem 0;flex-wrap:wrap}
+  .track-step{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:var(--text-muted);position:relative;padding:0 16px}
+  .track-step:not(:last-child)::after{content:'';position:absolute;top:14px;right:-10px;width:20px;height:1px;background:var(--border-strong)}
+  .track-step-dot{width:28px;height:28px;border-radius:50%;background:var(--bg-accent);border:2px solid var(--fill-accent);display:flex;align-items:center;justify-content:center;font-size:13px}
+  .track-step.done .track-step-dot{background:var(--fill-accent);color:white}
+
+  /* ORDERS */
+  .order-card{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem;margin-bottom:10px;transition:.15s}
+  .order-card:hover{border-color:var(--border-strong)}
+  .order-card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem}
+  .order-card-num{font-size:13px;font-weight:600;font-family:monospace;letter-spacing:.3px}
+  .order-card-items{font-size:12px;color:var(--text-muted);margin-bottom:.4rem}
+
+  /* ADMIN */
+  .admin-header{background:var(--surface-2);border-bottom:1px solid var(--border);padding:.9rem 1rem;display:flex;align-items:center;gap:10px}
+  .admin-header h2{font-size:17px;font-weight:600}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem}
+  .stat-card{background:var(--surface-2);border-radius:var(--radius);padding:1rem 1.1rem;border:1px solid var(--border)}
+  .stat-card .label{font-size:12px;color:var(--text-muted);margin-bottom:5px;display:flex;align-items:center;gap:5px}
+  .stat-card .value{font-size:22px;font-weight:700;color:var(--text-primary)}
+  .admin-table{width:100%;border-collapse:collapse;font-size:13px}
+  .admin-table th{text-align:left;padding:8px 10px;color:var(--text-muted);font-weight:600;font-size:11px;text-transform:uppercase;border-bottom:1px solid var(--border)}
+  .admin-table td{padding:9px 10px;border-bottom:1px solid var(--border)}
+  .status-badge{padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+  .status-badge.confirmed,.status-badge.delivered{background:var(--bg-success);color:var(--text-success)}
+  .status-badge.pending{background:var(--bg-warning);color:var(--text-warning)}
+  .status-badge.shipped{background:#dbeafe;color:#1d4ed8}
+  .status-badge.cancelled{background:var(--bg-danger);color:var(--text-danger)}
+
+  /* AUTH MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:400;display:flex;align-items:center;justify-content:center}
+  .modal-overlay.hidden{display:none}
+  .modal{background:var(--surface-2);border-radius:16px;padding:1.75rem;width:360px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,.15)}
+  .modal h2{font-size:20px;font-weight:700;margin-bottom:1.25rem}
+  .modal .form-field{margin-bottom:.85rem}
+  .modal-btn{width:100%;padding:11px;background:var(--fill-accent);color:white;border:none;border-radius:var(--radius);cursor:pointer;font-size:15px;font-weight:600;margin-top:.5rem;font-family:inherit;transition:.15s}
+  .modal-btn:hover{background:#15803d}
+  .modal-toggle{font-size:13px;color:var(--text-muted);text-align:center;margin-top:1rem}
+  .modal-toggle a{color:var(--text-accent);cursor:pointer;text-decoration:underline}
+  .modal-close{float:right;background:none;border:none;cursor:pointer;font-size:20px;color:var(--text-muted);margin-top:-4px}
+  .error-msg{font-size:12px;color:var(--text-danger);margin-bottom:.75rem;padding:8px;background:var(--bg-danger);border-radius:6px}
+  .success-msg{font-size:12px;color:var(--text-success);margin-bottom:.75rem;padding:8px;background:var(--bg-success);border-radius:6px}
+
+  /* BACK BTN */
+  .back-btn{display:flex;align-items:center;gap:6px;background:none;border:none;cursor:pointer;font-size:13px;color:var(--text-muted);padding:0 0 1rem;font-family:inherit}
+  .back-btn:hover{color:var(--text-primary)}
+
+  /* AI CHAT */
+  .chat-toggle{position:fixed;bottom:24px;right:24px;width:52px;height:52px;border-radius:50%;background:var(--fill-accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;color:white;z-index:300;box-shadow:0 4px 12px rgba(22,163,74,.4);transition:.2s}
+  .chat-toggle:hover{transform:scale(1.05);background:#15803d}
+  .chat-panel{position:fixed;bottom:86px;right:24px;width:340px;background:var(--surface-2);border:1px solid var(--border);border-radius:16px;display:flex;flex-direction:column;z-index:300;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+  .chat-panel.hidden{display:none}
+  .chat-header{background:var(--fill-accent);color:white;padding:12px 16px;display:flex;align-items:center;gap:10px;justify-content:space-between}
+  .chat-header-left{display:flex;align-items:center;gap:10px}
+  .chat-avatar{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:18px}
+  .chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;max-height:320px;min-height:220px}
+  .msg{padding:9px 12px;border-radius:10px;font-size:13px;line-height:1.55;max-width:88%}
+  .msg.user{background:var(--fill-accent);color:white;align-self:flex-end;border-bottom-right-radius:3px}
+  .msg.ai{background:var(--surface-1);color:var(--text-primary);align-self:flex-start;border-bottom-left-radius:3px;border:1px solid var(--border)}
+  .msg.typing{color:var(--text-muted);font-style:italic}
+  .chat-input-row{display:flex;gap:8px;padding:10px;border-top:1px solid var(--border)}
+  .chat-input-row input{flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;background:var(--surface-1);color:var(--text-primary);font-family:inherit;outline:none}
+  .chat-input-row input:focus{border-color:var(--border-accent)}
+  .chat-send{padding:8px 12px;background:var(--fill-accent);color:white;border:none;border-radius:var(--radius);cursor:pointer;font-size:13px;transition:.15s}
+  .chat-send:hover{background:#15803d}
+
+  /* TOAST */
+  .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);padding:9px 20px;border-radius:var(--radius);font-size:13px;z-index:500;pointer-events:none;font-weight:500;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+
+  /* EMPTY STATE */
+  .empty-state{text-align:center;padding:3.5rem 1rem;color:var(--text-muted)}
+  .empty-state i{font-size:44px;display:block;margin-bottom:.75rem;opacity:.5}
+  .empty-state p{margin-bottom:1.25rem;font-size:15px}
+
+  /* RESPONSIVE */
+  @media(max-width:640px){
+    .main{grid-template-columns:1fr}
+    .sidebar{display:none}
+    .detail-grid{grid-template-columns:1fr}
+    .stat-grid{grid-template-columns:1fr 1fr}
+    .form-grid{grid-template-columns:1fr}
+    .pay-options{grid-template-columns:1fr}
+  }
+
+  /* FREE SHIPPING BANNER */
+  .free-ship-bar{background:var(--fill-accent);color:white;text-align:center;font-size:12px;padding:5px;font-weight:500}
+</style>
+</head>
+<body>
+
+<!-- FREE SHIPPING BAR -->
+<div class="free-ship-bar">🚚 Free delivery on orders over Rs 2,000 | پاکستان بھر میں ڈیلیوری</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="nav-brand" href="#" onclick="showView('home');return false">
+    <i class="ti ti-shopping-cart-heart" style="color:#16a34a;font-size:22px"></i>
+    BazaarPK
+    <span class="nav-brand-sub">بازار پی کے</span>
+  </a>
+  <div class="nav-search">
+    <i class="ti ti-search"></i>
+    <input type="text" id="searchInput" placeholder="Search products... مصنوعات تلاش کریں" oninput="handleSearch(this.value)">
+  </div>
+  <div class="nav-actions">
+    <button class="nav-btn" onclick="showView('orders')"><i class="ti ti-package"></i> Orders</button>
+    <button class="nav-btn" onclick="showView('cart')">
+      <i class="ti ti-shopping-cart"></i> Cart
+      <span class="badge" id="cartBadge" style="display:none">0</span>
+    </button>
+    <button class="nav-btn" id="authBtn" onclick="toggleAuth()">
+      <i class="ti ti-user"></i> <span id="authLabel">Sign in</span>
+    </button>
+    <button class="nav-btn" onclick="showView('admin')" title="Admin panel"><i class="ti ti-settings"></i></button>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h3>Categories</h3>
+    <div class="cat-item active" onclick="filterCat('')" id="cat-all">
+      <i class="ti ti-layout-grid"></i> All Products
+    </div>
+    <div id="catList"></div>
+
+    <div class="sidebar-section">
+      <div class="price-range">
+        <label>Max price: <strong id="priceLabel">Rs 50,000</strong></label>
+        <input type="range" min="100" max="50000" step="100" value="50000" id="priceRange" oninput="filterPrice(this.value)">
+        <div class="price-vals"><span>Rs 100</span><span>Rs 50,000</span></div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="cat-item" onclick="showView('admin')">
+        <i class="ti ti-chart-bar"></i> Admin dashboard
+      </div>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- HOME -->
+    <div class="view active" id="view-home">
+      <div class="toolbar">
+        <select id="sortSelect" onchange="sortProducts(this.value)">
+          <option value="default">Default sorting</option>
+          <option value="price-asc">Price: low to high</option>
+          <option value="price-desc">Price: high to low</option>
+          <option value="rating">Best rated</option>
+          <option value="name">Name A–Z</option>
+        </select>
+        <span class="count" id="productCount">Loading...</span>
+      </div>
+      <div class="product-grid" id="productGrid"></div>
+    </div>
+
+    <!-- PRODUCT DETAIL -->
+    <div class="view" id="view-detail">
+      <button class="back-btn" onclick="showView('home')"><i class="ti ti-arrow-left"></i> Back to products</button>
+      <div class="product-detail" id="detailContent"></div>
+    </div>
+
+    <!-- CART -->
+    <div class="view" id="view-cart">
+      <button class="back-btn" onclick="showView('home')"><i class="ti ti-arrow-left"></i> Continue shopping</button>
+      <div class="cart-view" id="cartContent"></div>
+    </div>
+
+    <!-- CHECKOUT -->
+    <div class="view" id="view-checkout">
+      <button class="back-btn" onclick="showView('cart')"><i class="ti ti-arrow-left"></i> Back to cart</button>
+      <div class="checkout-view" id="checkoutContent"></div>
+    </div>
+
+    <!-- CONFIRMATION -->
+    <div class="view" id="view-confirm">
+      <div class="confirm-view" id="confirmContent"></div>
+    </div>
+
+    <!-- ORDERS -->
+    <div class="view" id="view-orders">
+      <button class="back-btn" onclick="showView('home')"><i class="ti ti-arrow-left"></i> Back to shopping</button>
+      <div id="ordersContent"></div>
+    </div>
+
+    <!-- ADMIN -->
+    <div class="view" id="view-admin">
+      <div class="admin-header">
+        <i class="ti ti-chart-bar" style="font-size:22px;color:var(--text-accent)"></i>
+        <h2>Admin Dashboard</h2>
+        <button class="back-btn" onclick="showView('home')" style="margin:0 0 0 auto"><i class="ti ti-arrow-left"></i> Store</button>
+      </div>
+      <div style="padding:1rem">
+        <div class="stat-grid" id="adminStats"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
+          <div>
+            <h3 style="font-size:14px;font-weight:600;margin-bottom:.75rem">Recent Orders</h3>
+            <div id="adminOrders"></div>
+          </div>
+          <div>
+            <h3 style="font-size:14px;font-weight:600;margin-bottom:.75rem">Payment breakdown</h3>
+            <div id="adminPayChart" style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:1rem"></div>
+            <h3 style="font-size:14px;font-weight:600;margin-bottom:.75rem">Products by category</h3>
+            <div id="adminCatChart" style="background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:1rem"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay hidden" id="authModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeAuth()">×</button>
+    <h2 id="authTitle">Sign in</h2>
+    <div class="error-msg" id="authError" style="display:none"></div>
+    <div class="success-msg" id="authSuccess" style="display:none"></div>
+    <div id="authRegExtra" style="display:none">
+      <div class="form-field"><label>Full name</label><input type="text" id="authName" placeholder="Your full name"></div>
+      <div class="form-field"><label>Phone (optional)</label><input type="text" id="authPhone" placeholder="03xx-xxxxxxx"></div>
+    </div>
+    <div class="form-field"><label>Email</label><input type="email" id="authEmail" placeholder="you@example.com"></div>
+    <div class="form-field"><label>Password</label><input type="password" id="authPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')submitAuth()"></div>
+    <button class="modal-btn" onclick="submitAuth()" id="authSubmitBtn">Sign in</button>
+    <div class="modal-toggle">
+      <span id="authToggleText">Don't have an account?</span>
+      <a onclick="toggleAuthMode()"> <span id="authToggleLink">Register</span></a>
+    </div>
+    <p style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:.75rem">Demo admin: admin@bazaarpk.com / admin123</p>
+  </div>
+</div>
+
+<!-- AI CHAT BUTTON -->
+<button class="chat-toggle" onclick="toggleChat()" title="AI Shopping Assistant" aria-label="Chat with AI assistant">
+  <i class="ti ti-message-chatbot"></i>
+</button>
+
+<!-- AI CHAT PANEL -->
+<div class="chat-panel hidden" id="chatPanel">
+  <div class="chat-header">
+    <div class="chat-header-left">
+      <div class="chat-avatar"><i class="ti ti-robot" style="font-size:18px"></i></div>
+      <div>
+        <div style="font-size:13px;font-weight:600">BazaarPK Assistant</div>
+        <div style="font-size:10px;opacity:.8">Powered by Claude AI ✦</div>
+      </div>
+    </div>
+    <button onclick="toggleChat()" style="background:none;border:none;color:white;cursor:pointer;font-size:20px;line-height:1" aria-label="Close">×</button>
+  </div>
+  <div class="chat-msgs" id="chatMsgs">
+    <div class="msg ai">السلام علیکم! 👋 I'm your BazaarPK AI assistant. Ask me about products, delivery, payments, or anything else about the store!</div>
+    <div class="msg ai" style="font-size:12px">Try asking: "What's good under Rs 1000?" or "How do I pay with Easypaisa?"</div>
+  </div>
+  <div class="chat-input-row">
+    <input type="text" id="chatInput" placeholder="Ask about products, delivery..." onkeydown="if(event.key==='Enter')sendChat()">
+    <button class="chat-send" onclick="sendChat()"><i class="ti ti-send"></i></button>
+  </div>
+</div>
+
+<script>
+// ═══ DATA ════════════════════════════════════════════════════════════════════
+const CATS = [
+  {slug:'groceries', name:'Groceries',    name_ur:'گروسری',      icon:'ti-shopping-bag'},
+  {slug:'clothing',  name:'Clothing',     name_ur:'لباس',        icon:'ti-shirt'},
+  {slug:'electronics',name:'Electronics',name_ur:'الیکٹرونکس',  icon:'ti-device-mobile'},
+  {slug:'home',      name:'Home',         name_ur:'گھر',         icon:'ti-home'},
+  {slug:'sports',    name:'Sports',       name_ur:'کھیل',        icon:'ti-ball-football'},
+  {slug:'books',     name:'Books',        name_ur:'کتابیں',      icon:'ti-book'},
+  {slug:'beauty',    name:'Beauty',       name_ur:'خوبصورتی',    icon:'ti-sparkles'},
+];
+
+const EMOJI = {groceries:'🥬',clothing:'👗',electronics:'📱',home:'🏠',sports:'⚽',books:'📚',beauty:'💄'};
+
+const PRODUCTS = [
+  {id:1, name:'Basmati Rice 5kg',         name_ur:'باسمتی چاول ۵ کلو',    category:'groceries',   price:1200, sale_price:950,  stock:150, rating:4.5, reviews:89,  desc:'Premium Kainat basmati rice from Punjab. Long grain, aromatic — perfect for biryani and pulao.'},
+  {id:2, name:'Lawn Shalwar Kameez',       name_ur:'لان شلوار قمیض',       category:'clothing',    price:3500, sale_price:2800, stock:45,  rating:4.3, reviews:56,  desc:'Beautiful printed lawn shalwar kameez, ready to wear. Available in S, M, L, XL.'},
+  {id:3, name:'Samsung Galaxy A35',        name_ur:'سیمسنگ گلیکسی A35',   category:'electronics', price:65000,sale_price:59999,stock:20,  rating:4.6, reviews:120, desc:'6.6" Super AMOLED, 50MP camera, 5000mAh battery. 8GB RAM + 256GB storage. Dual SIM.'},
+  {id:4, name:'Lahori Achaar (Mixed) 750g',name_ur:'لاہوری اچار (ملکسڈ)', category:'groceries',   price:450,  sale_price:null, stock:200, rating:4.8, reviews:210, desc:'Authentic homemade mixed pickle. No artificial colours or preservatives. 750g jar.'},
+  {id:5, name:'Chiffon Dupatta',           name_ur:'شیفون دوپٹہ',          category:'clothing',    price:800,  sale_price:650,  stock:80,  rating:4.1, reviews:33,  desc:'Lightweight chiffon dupatta with floral print. Perfect for formal and casual wear.'},
+  {id:6, name:'Haier 1.5 Ton Inverter AC', name_ur:'ہائیر انورٹر AC',     category:'electronics', price:95000,sale_price:85000,stock:12,  rating:4.4, reviews:67,  desc:'18000 BTU Haier inverter split AC. Energy saver, 5-star rating, includes installation kit.'},
+  {id:7, name:'Cricket Bat (Kashmir Willow)',name_ur:'کرکٹ بیٹ',           category:'sports',      price:4500, sale_price:3800, stock:35,  rating:4.7, reviews:145, desc:'Full-size Kashmir willow cricket bat. Oiled and ready to play. Weight 1.2–1.4 lbs.'},
+  {id:8, name:'Nishat Linen Bedsheet Set', name_ur:'نشاط لینن بیڈشیٹ',    category:'home',        price:5500, sale_price:4200, stock:28,  rating:4.5, reviews:78,  desc:'King-size 3-piece set — 1 flat sheet + 2 pillowcases. 100% cotton. Machine washable.'},
+  {id:9, name:'Urdu Grammar Book',         name_ur:'اردو گرامر کتاب',      category:'books',       price:650,  sale_price:null, stock:100, rating:4.9, reviews:312, desc:'Comprehensive Urdu grammar guide by Prof. Fateh ud Din. Class 9–12 standard.'},
+  {id:10,name:"Pond's White Beauty Cream", name_ur:'پونڈز فیس کریم',       category:'beauty',      price:550,  sale_price:480,  stock:180, rating:4.2, reviews:94,  desc:"Ponds White Beauty SPF 15 daily moisturiser. 75g tube. Suitable for all skin types."},
+  {id:11,name:'True Wireless Earbuds',     name_ur:'وائرلیس ایئربڈز',      category:'electronics', price:3200, sale_price:2500, stock:60,  rating:4.3, reviews:88,  desc:'6-hour battery, fast charge, IPX4 waterproof, touch controls. Compatible with Android & iOS.'},
+  {id:12,name:'Football (Sialkot Made)',   name_ur:'فٹ بال (سیالکوٹ)',     category:'sports',      price:1800, sale_price:null, stock:90,  rating:4.8, reviews:203, desc:'Hand-stitched size-5 football. Export quality from Sialkot. FIFA standard materials.'},
+  {id:13,name:'Dettol Soap 4-pack',        name_ur:'ڈیٹول صابن ۴ پیک',    category:'groceries',   price:420,  sale_price:360,  stock:500, rating:4.6, reviews:450, desc:'Antibacterial original scent. 4 × 115g bars. Clinically proven germ protection.'},
+  {id:14,name:'Janamaz (Prayer Rug)',       name_ur:'جائے نماز',            category:'home',        price:1200, sale_price:900,  stock:70,  rating:4.9, reviews:280, desc:'Velvet embroidered prayer mat. Soft padded base. 60 × 110 cm. Multiple colours available.'},
+  {id:15,name:'Kurkure Masala 6-pack',     name_ur:'کرکرے مصالہ ۶ پیک',   category:'groceries',   price:360,  sale_price:null, stock:300, rating:4.4, reviews:167, desc:'Kurkure triangles masala flavour. 6 × 62g packs. The ultimate desi snack!'},
+  {id:16,name:'Pakistan Flag T-Shirt',     name_ur:'پاکستانی پرچم ٹی شرٹ', category:'clothing',    price:950,  sale_price:750,  stock:120, rating:4.5, reviews:99,  desc:'100% cotton round-neck tee with embroidered Pakistan flag. Available S–XXL. Show your pride!'},
+];
+
+const PAY_OPTIONS = [
+  {id:'cod',       label:'Cash on Delivery', icon:'💵', note:'Pay when delivered'},
+  {id:'easypaisa', label:'Easypaisa',        icon:'📲', note:'Mobile wallet'},
+  {id:'jazzcash',  label:'JazzCash',         icon:'🎵', note:'Wallet / MPIN'},
+  {id:'bank',      label:'Bank Transfer',    icon:'🏦', note:'HBL / UBL / MCB'},
+  {id:'card',      label:'Debit / Credit',   icon:'💳', note:'Visa / MasterCard'},
+];
+
+const PROVINCES = ['Punjab','Sindh','Khyber Pakhtunkhwa','Balochistan','Islamabad (ICT)','Azad Kashmir','Gilgit-Baltistan'];
+const CITIES    = ['Karachi','Lahore','Islamabad','Rawalpindi','Faisalabad','Multan','Peshawar','Quetta','Sialkot','Gujranwala','Hyderabad','Abbottabad'];
+const PROMOS    = {
+  BAZAAR10: {type:'percent', value:10, min:1000, max:500},
+  SAVE200:  {type:'fixed',   value:200, min:2000},
+  WELCOME:  {type:'percent', value:15, min:500,  max:300},
+};
+
+// ═══ STATE ═══════════════════════════════════════════════════════════════════
+let cart     = JSON.parse(localStorage.getItem('bpk_cart')   || '[]');
+let orders   = JSON.parse(localStorage.getItem('bpk_orders') || '[]');
+let user     = JSON.parse(localStorage.getItem('bpk_user')   || 'null');
+let filters  = {category:'', search:'', maxPrice:50000, sort:'default'};
+let checkout = {payment:'cod', promoDiscount:0, promoCode:''};
+let detailQty = 1;
+let selProduct = null;
+let authMode   = 'login';
+let chatOpen   = false;
+let chatHistory = [];
+const demoUsers = [];
+
+function saveCart()   { localStorage.setItem('bpk_cart',   JSON.stringify(cart)); }
+function saveOrders() { localStorage.setItem('bpk_orders', JSON.stringify(orders)); }
+function saveUser()   { localStorage.setItem('bpk_user',   JSON.stringify(user)); }
+
+// ═══ VIEWS ═══════════════════════════════════════════════════════════════════
+function showView(v) {
+  document.querySelectorAll('.view').forEach(e => e.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  if (v==='cart')    renderCart();
+  if (v==='checkout') renderCheckout();
+  if (v==='orders')  renderOrders();
+  if (v==='admin')   renderAdmin();
+  window.scrollTo(0,0);
+}
+
+// ═══ CATEGORIES ══════════════════════════════════════════════════════════════
+function renderCats() {
+  document.getElementById('catList').innerHTML = CATS.map(c =>
+    `<div class="cat-item" id="cat-${c.slug}" onclick="filterCat('${c.slug}')">
+       <i class="ti ${c.icon}"></i> ${c.name}
+     </div>`).join('');
+}
+function filterCat(slug) {
+  filters.category = slug;
+  document.querySelectorAll('.cat-item').forEach(e => e.classList.remove('active'));
+  document.getElementById('cat-'+(slug||'all')).classList.add('active');
+  showView('home');
+  renderProducts();
+}
+
+// ═══ PRODUCTS ════════════════════════════════════════════════════════════════
+function getFiltered() {
+  let p = [...PRODUCTS];
+  if (filters.category) p = p.filter(x => x.category === filters.category);
+  if (filters.search) {
+    const q = filters.search.toLowerCase();
+    p = p.filter(x => x.name.toLowerCase().includes(q) || x.name_ur.includes(q) || x.desc.toLowerCase().includes(q));
+  }
+  p = p.filter(x => (x.sale_price||x.price) <= filters.maxPrice);
+  switch(filters.sort) {
+    case 'price-asc':  p.sort((a,b)=>(a.sale_price||a.price)-(b.sale_price||b.price)); break;
+    case 'price-desc': p.sort((a,b)=>(b.sale_price||b.price)-(a.sale_price||a.price)); break;
+    case 'rating':     p.sort((a,b)=>b.rating-a.rating); break;
+    case 'name':       p.sort((a,b)=>a.name.localeCompare(b.name)); break;
+  }
+  return p;
+}
+
+function renderProducts() {
+  const items = getFiltered();
+  document.getElementById('productCount').textContent = `${items.length} product${items.length!==1?'s':''}`;
+  document.getElementById('productGrid').innerHTML = items.map(p => {
+    const price = p.sale_price || p.price;
+    const disc  = p.sale_price ? Math.round((1 - p.sale_price/p.price)*100) : 0;
+    const stars = '★'.repeat(Math.round(p.rating)) + '☆'.repeat(5-Math.round(p.rating));
+    return `<div class="product-card" onclick="openProduct(${p.id})">
+      <div class="product-img">
+        ${EMOJI[p.category]||'📦'}
+        ${disc ? `<span class="product-badge">-${disc}%</span>` : ''}
+      </div>
+      <div class="product-body">
+        <div class="product-name">${p.name}</div>
+        <div class="product-ur">${p.name_ur}</div>
+        <div class="product-price">
+          <span class="price-main">Rs ${price.toLocaleString()}</span>
+          ${p.sale_price ? `<span class="price-old">Rs ${p.price.toLocaleString()}</span>` : ''}
+        </div>
+        <div class="stars">${stars} <span style="color:var(--text-muted);font-size:11px;margin-left:2px">(${p.reviews})</span></div>
+        <button class="add-btn" onclick="event.stopPropagation();addToCart(${p.id})">
+          <i class="ti ti-cart-plus"></i> Add to cart
+        </button>
+      </div>
+    </div>`;
+  }).join('') || '<div class="empty-state"><i class="ti ti-search"></i><p>No products found</p></div>';
+}
+
+function handleSearch(v) { filters.search = v; renderProducts(); }
+function filterPrice(v)  { filters.maxPrice = +v; document.getElementById('priceLabel').textContent = 'Rs '+Number(v).toLocaleString(); renderProducts(); }
+function sortProducts(v) { filters.sort = v; renderProducts(); }
+
+// ═══ PRODUCT DETAIL ══════════════════════════════════════════════════════════
+function openProduct(id) {
+  selProduct = PRODUCTS.find(p => p.id === id);
+  detailQty = 1;
+  const p = selProduct;
+  const price = p.sale_price || p.price;
+  const disc  = p.sale_price ? Math.round((1-p.sale_price/p.price)*100) : 0;
+  const stars = '★'.repeat(Math.round(p.rating)) + '☆'.repeat(5-Math.round(p.rating));
+  document.getElementById('detailContent').innerHTML = `
+    <div class="detail-grid">
+      <div class="detail-img-box">${EMOJI[p.category]||'📦'}</div>
+      <div class="detail-info">
+        <h1>${p.name}</h1>
+        <div class="detail-ur">${p.name_ur}</div>
+        <div class="detail-meta">
+          <div class="detail-meta-item"><i class="ti ti-tag"></i> ${CATS.find(c=>c.slug===p.category)?.name}</div>
+          <div class="detail-meta-item">${p.stock > 0 ? `<i class="ti ti-check" style="color:var(--text-success)"></i> <span style="color:var(--text-success)">In stock (${p.stock})</span>` : '<span style="color:var(--text-danger)">Out of stock</span>'}</div>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:.25rem">
+          <div class="detail-price">Rs ${price.toLocaleString()}</div>
+          ${disc ? `<span style="background:var(--bg-danger);color:var(--text-danger);font-size:12px;padding:2px 7px;border-radius:4px;font-weight:600">-${disc}%</span>` : ''}
+        </div>
+        ${p.sale_price ? `<div class="detail-oldprice">Was Rs ${p.price.toLocaleString()}</div>` : ''}
+        <div class="stars" style="font-size:14px;margin-bottom:1rem">${stars} <span style="color:var(--text-muted);font-size:13px;margin-left:4px">${p.reviews} reviews · ${p.rating}/5</span></div>
+        <div class="detail-desc">${p.desc}</div>
+        <div class="qty-row">
+          <span style="font-size:13px;color:var(--text-muted);margin-right:4px">Qty:</span>
+          <button class="qty-btn" onclick="changeQty(-1)">−</button>
+          <span class="qty-num" id="detailQtyNum">1</span>
+          <button class="qty-btn" onclick="changeQty(1)">+</button>
+        </div>
+        <button class="add-to-cart-btn" onclick="addToCart(${p.id}, detailQty)">
+          <i class="ti ti-cart-plus"></i> Add to cart — Rs ${(price * 1).toLocaleString()}
+        </button>
+        <div style="display:flex;gap:12px;margin-top:.75rem;font-size:12px;color:var(--text-muted)">
+          <span><i class="ti ti-truck"></i> Free delivery over Rs 2,000</span>
+          <span><i class="ti ti-refresh"></i> 7-day returns</span>
+        </div>
+      </div>
+    </div>`;
+  showView('detail');
+}
+
+function changeQty(d) {
+  detailQty = Math.max(1, Math.min(selProduct?.stock||10, detailQty + d));
+  document.getElementById('detailQtyNum').textContent = detailQty;
+}
+
+// ═══ CART ═════════════════════════════════════════════════════════════════════
+function addToCart(id, qty=1) {
+  const ex = cart.find(c => c.id === id);
+  if (ex) ex.qty = Math.min(ex.qty + qty, 10);
+  else cart.push({id, qty});
+  saveCart(); updateCartBadge(); showToast('Added to cart ✓');
+}
+function updateCartBadge() {
+  const n = cart.reduce((s,c) => s+c.qty, 0);
+  const b = document.getElementById('cartBadge');
+  b.textContent = n; b.style.display = n>0 ? 'flex' : 'none';
+}
+function cartTotal() {
+  return cart.reduce((s,c) => {
+    const p = PRODUCTS.find(x => x.id===c.id);
+    return s + (p ? (p.sale_price||p.price)*c.qty : 0);
+  }, 0);
+}
+
+function renderCart() {
+  const el = document.getElementById('cartContent');
+  if (cart.length === 0) {
+    el.innerHTML = `<h2 style="font-size:18px;font-weight:600;margin-bottom:1.5rem">Shopping cart</h2><div class="empty-state"><i class="ti ti-shopping-cart"></i><p>Your cart is empty</p><button class="add-btn" onclick="showView('home')" style="display:inline-block;width:auto;padding:8px 20px">Browse products</button></div>`;
+    return;
+  }
+  const sub  = cartTotal();
+  const ship = sub >= 2000 ? 0 : 200;
+  const disc = checkout.promoDiscount || 0;
+  const tot  = sub - disc + ship;
+
+  el.innerHTML = `
+    <h2 style="font-size:18px;font-weight:600;margin-bottom:1rem">Shopping cart (${cart.reduce((s,c)=>s+c.qty,0)} items)</h2>
+    ${cart.map(c => {
+      const p = PRODUCTS.find(x=>x.id===c.id); if(!p) return '';
+      const price = p.sale_price||p.price;
+      return `<div class="cart-item">
+        <div class="cart-item-img">${EMOJI[p.category]||'📦'}</div>
+        <div class="cart-item-info">
+          <div class="cart-item-name">${p.name}</div>
+          <div class="cart-item-price">Rs ${price.toLocaleString()} × ${c.qty} = <strong>Rs ${(price*c.qty).toLocaleString()}</strong></div>
+        </div>
+        <div class="cart-item-actions">
+          <button class="qty-btn" onclick="updQty(${p.id},-1)">−</button>
+          <span class="qty-num" style="min-width:22px">${c.qty}</span>
+          <button class="qty-btn" onclick="updQty(${p.id},1)">+</button>
+          <button class="qty-btn" onclick="remFromCart(${p.id})" style="color:var(--text-danger);margin-left:4px" title="Remove"><i class="ti ti-trash"></i></button>
+        </div>
+      </div>`;
+    }).join('')}
+    <div class="cart-summary">
+      <div class="promo-row">
+        <input type="text" id="promoInput" placeholder="Promo code (try BAZAAR10)" value="${checkout.promoCode}">
+        <button class="add-btn" style="width:auto;white-space:nowrap;padding:8px 14px" onclick="applyPromo()">Apply</button>
+      </div>
+      ${disc > 0 ? `<div class="promo-msg"><i class="ti ti-check"></i> Discount applied: −Rs ${disc.toLocaleString()}</div>` : ''}
+      <div id="promoErr" style="font-size:12px;color:var(--text-danger);min-height:16px"></div>
+      <div class="summary-row"><span>Subtotal</span><span>Rs ${sub.toLocaleString()}</span></div>
+      ${disc > 0 ? `<div class="summary-row" style="color:var(--text-success)"><span>Promo (${checkout.promoCode})</span><span>−Rs ${disc.toLocaleString()}</span></div>` : ''}
+      <div class="summary-row"><span>Delivery</span><span>${ship===0?'<span style="color:var(--text-success)">Free 🎉</span>':'Rs '+ship}</span></div>
+      <div class="summary-row total"><span>Total</span><span style="color:var(--text-accent)">Rs ${tot.toLocaleString()}</span></div>
+    </div>
+    ${sub < 2000 ? `<p style="font-size:12px;color:var(--text-muted);margin:.5rem 0"><i class="ti ti-truck"></i> Add Rs ${(2000-sub).toLocaleString()} more for free delivery!</p>` : ''}
+    <button class="checkout-btn" onclick="showView('checkout')">Proceed to checkout →</button>`;
+}
+
+function updQty(id, d) {
+  const item = cart.find(c=>c.id===id); if(!item) return;
+  item.qty = Math.max(0, item.qty + d);
+  if (item.qty === 0) cart = cart.filter(c=>c.id!==id);
+  saveCart(); updateCartBadge(); renderCart();
+}
+function remFromCart(id) { cart = cart.filter(c=>c.id!==id); saveCart(); updateCartBadge(); renderCart(); }
+
+function applyPromo() {
+  const code  = document.getElementById('promoInput').value.trim().toUpperCase();
+  const promo = PROMOS[code];
+  const sub   = cartTotal();
+  document.getElementById('promoErr').textContent = '';
+  if (!promo) { document.getElementById('promoErr').textContent = 'Invalid promo code'; return; }
+  if (sub < promo.min) { document.getElementById('promoErr').textContent = `Minimum order Rs ${promo.min.toLocaleString()}`; return; }
+  let disc = promo.type==='percent' ? sub*promo.value/100 : promo.value;
+  if (promo.max) disc = Math.min(disc, promo.max);
+  checkout.promoDiscount = Math.round(disc);
+  checkout.promoCode = code;
+  renderCart();
+}
+
+// ═══ CHECKOUT ════════════════════════════════════════════════════════════════
+function renderCheckout() {
+  const sub  = cartTotal();
+  const ship = sub >= 2000 ? 0 : 200;
+  const disc = checkout.promoDiscount || 0;
+  const tot  = sub - disc + ship;
+  document.getElementById('checkoutContent').innerHTML = `
+    <h2 style="font-size:18px;font-weight:600;margin-bottom:1rem">Checkout</h2>
+    <div class="form-section">
+      <h3><i class="ti ti-map-pin" style="color:var(--text-accent)"></i> Delivery address</h3>
+      <div class="form-grid">
+        <div class="form-field"><label>Full name *</label><input type="text" id="ck-name" placeholder="Your full name" value="${user?.name||''}"></div>
+        <div class="form-field"><label>Phone *</label><input type="text" id="ck-phone" placeholder="03xx-xxxxxxx"></div>
+        <div class="form-field full"><label>Street address *</label><input type="text" id="ck-street" placeholder="House #, Street name, Area"></div>
+        <div class="form-field"><label>City</label><select id="ck-city">${CITIES.map(c=>`<option>${c}</option>`).join('')}</select></div>
+        <div class="form-field"><label>Province</label><select id="ck-prov">${PROVINCES.map(p=>`<option>${p}</option>`).join('')}</select></div>
+      </div>
+    </div>
+    <div class="form-section">
+      <h3><i class="ti ti-credit-card" style="color:var(--text-accent)"></i> Payment method</h3>
+      <div class="pay-options">
+        ${PAY_OPTIONS.map(o=>`
+          <div class="pay-option ${checkout.payment===o.id?'selected':''}" onclick="selPay('${o.id}', this)">
+            <span class="pay-icon">${o.icon}</span>
+            <div><div class="pay-label">${o.label}</div><div class="pay-note">${o.note}</div></div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div class="form-section">
+      <h3><i class="ti ti-receipt" style="color:var(--text-accent)"></i> Order summary</h3>
+      <div class="summary-row"><span>Subtotal (${cart.reduce((s,c)=>s+c.qty,0)} items)</span><span>Rs ${sub.toLocaleString()}</span></div>
+      ${disc>0?`<div class="summary-row" style="color:var(--text-success)"><span>Discount</span><span>−Rs ${disc.toLocaleString()}</span></div>`:''}
+      <div class="summary-row"><span>Shipping</span><span>${ship===0?'<span style="color:var(--text-success)">Free</span>':'Rs '+ship}</span></div>
+      <div class="summary-row total"><span>Total</span><span style="color:var(--text-accent)">Rs ${tot.toLocaleString()}</span></div>
+    </div>
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:.5rem"><i class="ti ti-lock"></i> Secure checkout — your information is safe</p>
+    <button class="place-btn" onclick="placeOrder()"><i class="ti ti-check"></i> Place order — Rs ${tot.toLocaleString()}</button>`;
+}
+
+function selPay(id, el) {
+  checkout.payment = id;
+  document.querySelectorAll('.pay-option').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function placeOrder() {
+  const name   = document.getElementById('ck-name')?.value.trim();
+  const phone  = document.getElementById('ck-phone')?.value.trim();
+  const street = document.getElementById('ck-street')?.value.trim();
+  if (!name||!phone||!street) { showToast('Please fill in all required fields','error'); return; }
+
+  const sub  = cartTotal();
+  const ship = sub >= 2000 ? 0 : 200;
+  const disc = checkout.promoDiscount || 0;
+  const tot  = sub - disc + ship;
+  const num  = 'BPK-' + Date.now().toString(36).toUpperCase().slice(-6);
+  const payLabel = PAY_OPTIONS.find(p=>p.id===checkout.payment)?.label || checkout.payment;
+
+  const order = {
+    id: Date.now(), order_number: num, status:'confirmed',
+    payment_method: checkout.payment, payment_label: payLabel, total: tot,
+    items: cart.map(c => { const p=PRODUCTS.find(x=>x.id===c.id); return {name:p?.name, qty:c.qty, price:p?.sale_price||p?.price}; }),
+    city: document.getElementById('ck-city')?.value,
+    created_at: new Date().toISOString(),
+  };
+  orders.push(order); saveOrders();
+  cart=[]; saveCart(); updateCartBadge();
+  checkout.promoDiscount=0; checkout.promoCode='';
+
+  document.getElementById('confirmContent').innerHTML = `
+    <span class="confirm-icon">🎉</span>
+    <h2>شکریہ! آرڈر موصول ہوا</h2>
+    <p style="font-size:16px">Thank you, your order has been placed!</p>
+    <div class="order-num">${num}</div>
+    <p>Total: <strong style="color:var(--text-accent)">Rs ${tot.toLocaleString()}</strong> · ${payLabel}</p>
+    <div class="track-steps" style="margin-top:1.5rem">
+      <div class="track-step done"><div class="track-step-dot"><i class="ti ti-check" style="font-size:13px"></i></div><span>Confirmed</span></div>
+      <div class="track-step"><div class="track-step-dot">📦</div><span>Packing</span></div>
+      <div class="track-step"><div class="track-step-dot">🚚</div><span>Shipped</span></div>
+      <div class="track-step"><div class="track-step-dot">🏠</div><span>Delivered</span></div>
+    </div>
+    <p style="font-size:13px;color:var(--text-muted);margin-top:1rem">📅 Estimated delivery: 3–5 business days<br>آپ کا آرڈر ۳ سے ۵ کام کے دنوں میں پہنچ جائے گا</p>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:1.5rem">
+      <button class="add-btn" onclick="showView('home')" style="display:inline-block;width:auto;padding:9px 20px">Continue shopping</button>
+      <button class="add-btn" onclick="showView('orders')" style="display:inline-block;width:auto;padding:9px 20px">View my orders</button>
+    </div>`;
+  showView('confirm');
+}
+
+// ═══ ORDERS ══════════════════════════════════════════════════════════════════
+function renderOrders() {
+  const el = document.getElementById('ordersContent');
+  if (orders.length === 0) {
+    el.innerHTML = `<h2 style="font-size:18px;font-weight:600;margin-bottom:1.5rem">My orders</h2><div class="empty-state"><i class="ti ti-package"></i><p>No orders yet</p><button class="add-btn" onclick="showView('home')" style="display:inline-block;width:auto;padding:8px 20px">Start shopping</button></div>`;
+    return;
+  }
+  el.innerHTML = `<h2 style="font-size:18px;font-weight:600;margin-bottom:1rem">My orders (${orders.length})</h2>` +
+    [...orders].reverse().map(o => `
+      <div class="order-card">
+        <div class="order-card-head">
+          <span class="order-card-num">${o.order_number}</span>
+          <span class="status-badge ${o.status}">${o.status}</span>
+        </div>
+        <div class="order-card-items">${o.items?.map(i=>`${i.qty}× ${i.name}`).join(', ')}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:.4rem">
+          <span style="font-size:12px;color:var(--text-muted)">${new Date(o.created_at).toLocaleDateString('en-PK',{day:'numeric',month:'short',year:'numeric'})} · ${o.payment_label||o.payment_method}</span>
+          <span style="font-size:14px;font-weight:700;color:var(--text-accent)">Rs ${o.total?.toLocaleString()}</span>
+        </div>
+      </div>`).join('');
+}
+
+// ═══ ADMIN ════════════════════════════════════════════════════════════════════
+function renderAdmin() {
+  const rev = orders.reduce((s,o) => s+(o.total||0), 0);
+  const stats = [
+    {label:'Total revenue', value:'Rs '+rev.toLocaleString(), icon:'ti-currency-rupee'},
+    {label:'Orders',        value:orders.length,              icon:'ti-package'},
+    {label:'Products',      value:PRODUCTS.length,            icon:'ti-box'},
+    {label:'Categories',    value:CATS.length,                icon:'ti-layout-grid'},
+  ];
+  document.getElementById('adminStats').innerHTML = stats.map(s=>`
+    <div class="stat-card">
+      <div class="label"><i class="ti ${s.icon}"></i> ${s.label}</div>
+      <div class="value">${s.value}</div>
+    </div>`).join('');
+
+  document.getElementById('adminOrders').innerHTML = `
+    <table class="admin-table">
+      <thead><tr><th>Order #</th><th>Total</th><th>Payment</th><th>Status</th></tr></thead>
+      <tbody>${orders.length ? [...orders].reverse().slice(0,8).map(o=>`
+        <tr>
+          <td style="font-family:monospace;font-size:12px">${o.order_number}</td>
+          <td>Rs ${o.total?.toLocaleString()}</td>
+          <td style="font-size:12px">${o.payment_label||o.payment_method}</td>
+          <td><span class="status-badge ${o.status}">${o.status}</span></td>
+        </tr>`).join('') : '<tr><td colspan="4" style="color:var(--text-muted);padding:1rem;text-align:center">No orders yet — place one from the store!</td></tr>'}
+      </tbody>
+    </table>`;
+
+  const payCount = {}; orders.forEach(o=>{ payCount[o.payment_label||o.payment_method]=(payCount[o.payment_label||o.payment_method]||0)+1; });
+  const maxP = Math.max(...Object.values(payCount),1);
+  document.getElementById('adminPayChart').innerHTML = Object.keys(payCount).length
+    ? Object.entries(payCount).map(([k,v])=>`
+        <div style="margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>${k}</span><span style="font-weight:600">${v}</span></div>
+          <div style="height:7px;background:var(--bg-accent);border-radius:4px"><div style="height:7px;background:var(--fill-accent);border-radius:4px;width:${Math.round(v/maxP*100)}%"></div></div>
+        </div>`).join('')
+    : '<p style="font-size:13px;color:var(--text-muted)">Place some orders to see payment breakdown</p>';
+
+  const catCount = {}; PRODUCTS.forEach(p=>{ catCount[p.category]=(catCount[p.category]||0)+1; });
+  const maxC = Math.max(...Object.values(catCount));
+  document.getElementById('adminCatChart').innerHTML = Object.entries(catCount).map(([k,v])=>`
+    <div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>${EMOJI[k]||''} ${k}</span><span style="font-weight:600">${v}</span></div>
+      <div style="height:7px;background:#bbf7d0;border-radius:4px"><div style="height:7px;background:#16a34a;border-radius:4px;width:${Math.round(v/maxC*100)}%"></div></div>
+    </div>`).join('');
+}
+
+// ═══ AUTH ════════════════════════════════════════════════════════════════════
+function toggleAuth() { document.getElementById('authModal').classList.toggle('hidden'); }
+function closeAuth()  { document.getElementById('authModal').classList.add('hidden'); }
+
+function toggleAuthMode() {
+  authMode = authMode==='login' ? 'register' : 'login';
+  const isReg = authMode==='register';
+  document.getElementById('authTitle').textContent    = isReg ? 'Create account' : 'Sign in';
+  document.getElementById('authRegExtra').style.display = isReg ? 'block' : 'none';
+  document.getElementById('authSubmitBtn').textContent  = isReg ? 'Register' : 'Sign in';
+  document.getElementById('authToggleText').textContent = isReg ? 'Already have an account?' : "Don't have an account?";
+  document.getElementById('authToggleLink').textContent = isReg ? 'Sign in' : 'Register';
+  document.getElementById('authError').style.display = 'none';
+}
+
+function submitAuth() {
+  const email = document.getElementById('authEmail').value.trim();
+  const pass  = document.getElementById('authPass').value;
+  const errEl = document.getElementById('authError');
+  errEl.style.display = 'none';
+
+  if (authMode === 'register') {
+    const name = document.getElementById('authName').value.trim();
+    if (!name||!email||!pass) { errEl.textContent='All fields are required'; errEl.style.display='block'; return; }
+    if (demoUsers.find(u=>u.email===email)) { errEl.textContent='Email already registered'; errEl.style.display='block'; return; }
+    const u = {id:Date.now(), name, email, role:'customer'};
+    demoUsers.push({...u, pass});
+    user=u; saveUser();
+    document.getElementById('authLabel').textContent = name.split(' ')[0];
+    closeAuth(); showToast('Welcome to BazaarPK, '+name.split(' ')[0]+'! 🎉');
+  } else {
+    let found;
+    if (email==='admin@bazaarpk.com' && pass==='admin123') found={id:1,name:'Admin',email,role:'admin'};
+    else found = demoUsers.find(u=>u.email===email && u.pass===pass);
+    if (!found) { errEl.textContent='Invalid email or password'; errEl.style.display='block'; return; }
+    user=found; saveUser();
+    document.getElementById('authLabel').textContent = user.name.split(' ')[0];
+    closeAuth(); showToast('Welcome back, '+user.name.split(' ')[0]+'!');
+  }
+}
+
+// ═══ AI CHAT ══════════════════════════════════════════════════════════════════
+function toggleChat() {
+  chatOpen = !chatOpen;
+  document.getElementById('chatPanel').classList.toggle('hidden', !chatOpen);
+  if (chatOpen) document.getElementById('chatInput').focus();
+}
+
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const msg   = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+
+  const msgs = document.getElementById('chatMsgs');
+  msgs.innerHTML += `<div class="msg user">${msg}</div>`;
+  msgs.innerHTML += `<div class="msg ai typing" id="typing-msg">Typing…</div>`;
+  msgs.scrollTop  = msgs.scrollHeight;
+  chatHistory.push({role:'user', content:msg});
+
+  const sys = `You are a helpful, friendly shopping assistant for BazaarPK, a Pakistani e-commerce store. Help customers in English and Urdu (mixing is fine).
+
+Products available (${PRODUCTS.length} total): ${PRODUCTS.map(p=>`${p.name} Rs ${p.sale_price||p.price} (${p.category})`).join('; ')}.
+
+Key info:
+- Free delivery on orders over Rs 2,000, otherwise Rs 200 flat fee
+- Delivery time: 3–5 business days across Pakistan
+- Payment: Cash on Delivery, Easypaisa, JazzCash, Bank Transfer, Debit/Credit Card
+- Promo codes: BAZAAR10 (10% off, min Rs 1000), SAVE200 (Rs 200 off, min Rs 2000), WELCOME (15% off, min Rs 500)
+- Returns: 7-day return policy
+- Locations: we deliver all over Pakistan
+
+Be concise (under 120 words), helpful, and warm. Feel free to use some Urdu words naturally.`;
+
+  try {
+    const res  = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({model:'claude-sonnet-4-6', max_tokens:300, system:sys, messages:chatHistory})
+    });
+    const data  = await res.json();
+    const reply = data.content?.[0]?.text || 'Sorry, something went wrong. Please try again!';
+    chatHistory.push({role:'assistant', content:reply});
+    document.getElementById('typing-msg').outerHTML = `<div class="msg ai">${reply.replace(/\n/g,'<br>')}</div>`;
+  } catch {
+    document.getElementById('typing-msg').outerHTML = `<div class="msg ai" style="color:var(--text-danger)">AI assistant is temporarily unavailable. For help, please browse our products or contact support.</div>`;
+  }
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ═══ TOAST ════════════════════════════════════════════════════════════════════
+function showToast(msg, type='success') {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.style.background = type==='error' ? 'var(--fill-danger)' : 'var(--fill-success)';
+  t.style.color = 'white';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; t.style.transition='opacity .4s'; setTimeout(()=>t.remove(),400); }, 2200);
+}
+
+// ═══ INIT ═════════════════════════════════════════════════════════════════════
+renderCats();
+renderProducts();
+updateCartBadge();
+if (user) document.getElementById('authLabel').textContent = user.name.split(' ')[0];
+</script>
+</body>
+</html>
