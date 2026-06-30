@@ -1,42 +1,45 @@
 # BazaarPK — بازار پی کے
-A full-stack Pakistani e-commerce web application.
+A full-stack Pakistani e-commerce web application built with HTML, CSS, JavaScript, Node.js and MySQL.
 
 ## 🚀 Quick Start (Frontend only)
 Just open `frontend/index.html` in any browser — no installation needed!
 
 ## 📁 Project Structure
 ```
-bazaarpk-project/
+bazaarpk/
 ├── frontend/
 │   └── index.html        ← Open this in your browser
 ├── backend/
-│   ├── server.js         ← Node.js Express REST API
+│   ├── server.js         ← Node.js Express REST API (25+ endpoints)
 │   ├── package.json      ← Dependencies
 │   └── .env.example      ← Environment variables template
 ├── database/
-│   └── schema.sql        ← MySQL database schema
+│   └── schema.sql        ← MySQL database schema (11 tables)
 └── README.md
 ```
 
 ## 🛒 Features
 - 16 Pakistani products across 7 categories
-- Shopping cart with promo codes (try: BAZAAR10, SAVE200, WELCOME)
+- Product search, filtering by category and price, sorting
+- Shopping cart with quantity controls
+- Promo codes: BAZAAR10, SAVE200, WELCOME
 - Pakistani payment methods: Cash on Delivery, Easypaisa, JazzCash, Bank Transfer, Card
 - Order placement and order history
-- AI-powered shopping assistant (Claude AI)
-- Admin dashboard with stats and charts
-- Bilingual UI (English + Urdu)
-- Responsive design
+- Customer support chat (rule-based chatbot)
+- Admin dashboard with revenue stats and charts
+- Bilingual interface (English + Urdu)
+- Responsive design for mobile and desktop
+- User registration and login system
 
-## 🗄️ Running the Full Backend
+## 🗄️ Running the Backend
 ```bash
 # 1. Setup database
 mysql -u root -p < database/schema.sql
 
-# 2. Install backend
+# 2. Install and run backend
 cd backend
 cp .env.example .env
-# Edit .env with your MySQL password and JWT secret
+# Edit .env with your MySQL password
 npm install
 npm start
 # API runs at http://localhost:4000
@@ -46,7 +49,8 @@ npm start
 - Admin: admin@bazaarpk.com / admin123
 
 ## 🛠️ Tech Stack
-- Frontend: HTML, CSS, Vanilla JavaScript
-- Backend: Node.js, Express.js
-- Database: MySQL 8
-- AI: Anthropic Claude API
+- **Frontend:** HTML5, CSS3, Vanilla JavaScript
+- **Backend:** Node.js, Express.js, REST API
+- **Database:** MySQL 8 (11 tables, relational design)
+- **Authentication:** JWT (JSON Web Tokens), bcrypt password hashing
+- **Security:** Helmet.js, CORS, Rate limiting
